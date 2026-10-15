@@ -16,5 +16,5 @@ const elementosFake = [
   }
 ];
 for(const elemento in elementosFake){
-      if(elementosFake[elemento].style.color =='blue'){console.log("O elemento [tagName] é azul!")}
+      if(elemento.style.color =='blue'){console.log(`O elemento ${elemento.tagName} é azul!`)}
 }
