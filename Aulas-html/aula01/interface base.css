@@ -1,0 +1,32 @@
+.headernav{
+
+    border: 1px solid black;
+    color:black;
+    line-height: normal;
+    padding: 1px;
+
+}
+
+.header{
+
+    border: 1px solid black;
+    color:black;
+    line-height: normal;
+    padding: 5px;
+}
+
+#class1{
+    
+    font-style: italic;
+
+
+}
+.section1{
+    border: 1px solid black;
+    color:black;
+    line-height: normal;
+    padding: 1px;
+margin-top: 0cm;
+width: 200px;
+
+}
