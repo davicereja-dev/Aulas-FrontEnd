@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masterclass: CSS e Flexbox - Versão Pro</title>
+    <style>
+        :root {
+            --primary: #003366;
+            --secondary: #007bff;
+            --accent: #eef7ff;
+            --text: #1a1a1a;
+            --white: #ffffff;
+            --code-bg: #1e1e1e;
+            --code-text: #4ec9b0;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--primary);
+        }
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: var(--white);
+            padding: 60px 100px;
+            box-sizing: border-box;
+            animation: slideIn 0.4s ease-out;
+            overflow-y: auto;
+        }
+
+        .slide.active { 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 { font-size: 3.5rem; color: var(--primary); margin-bottom: 20px; border-left: 15px solid var(--secondary); padding-left: 20px; }
+        h2 { font-size: 2.2rem; color: var(--secondary); margin-top: 0; }
+        p, li { font-size: 1.6rem; line-height: 1.6; color: var(--text); }
+        
+        code {
+            background: var(--code-bg);
+            color: var(--code-text);
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        pre { 
+            background: var(--code-bg); 
+            color: #d4d4d4; 
+            padding: 30px; 
+            border-radius: 12px; 
+            font-size: 1.8rem;
+            line-height: 1.4;
+            overflow-x: auto;
+            border-left: 8px solid var(--secondary);
+            margin: 20px 0;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        button {
+            padding: 15px 30px;
+            background: var(--primary);
+            color: white;
+            border: 2px solid var(--white);
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: 0.3s;
+        }
+
+        button:hover { background: var(--secondary); transform: scale(1.05); }
+        
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 10px;
+            background: var(--secondary);
+            transition: width 0.3s;
+            z-index: 101;
+        }
+
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            color: var(--primary);
+            background: var(--accent);
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+<div class="slide-container" id="container"></div>
+<div class="slide-counter" id="counter">1 / 21</div>
+
+<div class="controls">
+    <button onclick="prev()">⬅ Anterior</button>
+    <button onclick="next()">Próximo ➡</button>
+</div>
+
+<script>
+    const slides = [
+        { t: "CSS: Fundamentos", c: "<h2>A Pele da Web</h2><p>Se o HTML é o esqueleto, o CSS (Cascading Style Sheets) é a pele, as roupas e a maquiagem. É o que dá vida, cor e posicionamento à sua estrutura.</p>" },
+        { t: "Passo 1: CSS Externo", c: "<h2>Conectando o CSS ao HTML</h2><p>A prática recomendada no desenvolvimento profissional é o CSS Externo. Você cria um arquivo <code>.css</code> separado e o vincula ao seu HTML.</p><pre>&lt;link rel='stylesheet' href='style.css'&gt;</pre><p>Esse link deve ser inserido dentro da tag <code>&lt;head&gt;</code>.</p>" },
+        { t: "Passo 2: Sintaxe", c: "<h2>A Estrutura da Regra</h2><p>O CSS funciona através de regras compostas por um <strong>seletor</strong> (quem estilizar) e <strong>declarações</strong> (o que alterar).</p><pre>seletor {\n  propriedade: valor;\n}</pre>" },
+        { t: "Os Seletores Essenciais", c: "<ul><li><strong>Tag:</strong> Afeta todos os elementos daquela tag (ex: <code>body</code>, <code>h1</code>).</li><li><strong>Classe (.):</strong> Afeta elementos com o atributo class. Totalmente reaproveitável (ex: <code>.texto-destaque</code>).</li><li><strong>ID (#):</strong> Afeta um único elemento com o atributo id (ex: <code>#menu-principal</code>).</li></ul>" },
+        { t: "Exemplos de Sintaxe", c: "<pre>/* Seletor de Tag */\nbody {\n  background-color: #1a1a1a;\n}\n\n/* Seletor de Classe */\n.texto-destaque {\n  color: #ff3333;\n  font-weight: bold;\n}</pre>" },
+        { t: "Passo 3: Box Model", c: "<h2>O Modelo de Caixa</h2><p>Tudo na web é uma caixa retangular. Compreender essas camadas é vital:</p><ul><li><strong>Content:</strong> O conteúdo real (texto, mídia).</li><li><strong>Padding:</strong> O preenchimento interno.</li><li><strong>Border:</strong> A linha estrutural ao redor.</li><li><strong>Margin:</strong> A margem externa que afasta os elementos.</li></ul>" },
+        { t: "Passo 4: Flexbox", c: "<h2>Layout Dinâmico</h2><p>Para alinhar elementos lado a lado ou distribuir espaços, o <code>display: flex</code> é a ferramenta moderna padrão.</p><pre>.container {\n  display: flex;\n  justify-content: center; /* Alinhamento horizontal */\n  align-items: center; /* Alinhamento vertical */\n  gap: 20px; /* Espaçamento cravado */\n}</pre>" },
+        
+        /* NOVOS SLIDES DE APROFUNDAMENTO AQUI */
+        { t: "Passo 5: Variáveis CSS", c: "<h2>O Poder das Custom Properties</h2><p>Variáveis CSS armazenam valores para reaproveitamento. O <strong>escopo global</strong> é definido no pseudo-elemento <code>:root</code> (a raiz do documento HTML).</p><pre>:root {\n  --cor-fundo: #1a1a1a;\n  --cor-texto: #ffffff;\n  --cor-primaria: #e50914;\n  --espacamento-base: 16px;\n}</pre>" },
+        { t: "Escopo Global vs Local", c: "<h2>Onde a Variável Existe?</h2><p>Se declarada no <code>:root</code>, vale para o site todo. Se declarada numa classe, vale só para ela e seus filhos (Escopo Local). Excelente para componentes específicos!</p><pre>.cartao-alerta {\n  /* Sobrescrevendo a variável apenas dentro deste cartão */\n  --cor-fundo: #ff3333;\n  background-color: var(--cor-fundo);\n}</pre>" },
+        { t: "O Poder do calc()", c: "<h2>Matemática no CSS</h2><p>Combine variáveis com a função <code>calc()</code> para criar espaçamentos matematicamente proporcionais sem precisar criar múltiplas variáveis.</p><pre>.container {\n  padding: var(--espacamento-base);\n  margin-bottom: calc(var(--espacamento-base) * 2); /* 32px */\n  width: calc(100% - 40px);\n}</pre>" },
+        { t: "Passo 6: Responsividade", c: "<h2>Mobile First vs Desktop First</h2><p>A indústria adota o <strong>Mobile First</strong>: estiliza-se primeiro para celular e usa-se <code>@media (min-width: X)</code> para adaptar quando a tela cresce.</p><pre>/* Estilo padrão (Celular) */\n.container-perfis { flex-direction: column; }\n\n/* A partir de 768px (Tablets/PCs) */\n@media (min-width: 768px) {\n  .container-perfis { flex-direction: row; }\n}</pre>" },
+        { t: "Responsividade Fluida", c: "<h2>A Magia das Variáveis + Media Queries</h2><p>Em vez de reescrever dezenas de classes no <code>@media</code>, simplesmente altere o valor da variável! O layout inteiro se adapta em cascata.</p><pre>@media (max-width: 480px) {\n  :root {\n    /* Reduz todos os espaçamentos do site de uma vez no mobile */\n    --espacamento-base: 8px; \n  }\n}</pre>" },
+        { t: "Temas: Dark Mode Nativo", c: "<h2>Lendo o Sistema Operacional</h2><p>A media query <code>prefers-color-scheme</code> detecta se o celular ou PC do usuário está configurado no modo escuro e aplica as variáveis sozinhas.</p><pre>@media (prefers-color-scheme: dark) {\n  :root {\n    --cor-fundo: #121212;\n    --cor-texto: #e0e0e0;\n  }\n}</pre>" },
+        { t: "Temas: Alternância Manual", c: "<h2>O Padrão da Indústria (Data Attributes)</h2><p>Em vez de encher o HTML de classes, frameworks modernos usam atributos <code>data-*</code> na tag <code>&lt;html&gt;</code> para forçar a troca de tema.</p><pre>/* Tema Claro Ativado pelo JavaScript */\nhtml[data-theme='light'] {\n  --cor-fundo: #f0f0f0;\n  --cor-texto: #111111;\n}</pre>" },
+        { t: "Design Tokens", c: "<h2>Arquitetura Profissional</h2><p>Essas variáveis no <code>:root</code> que definem cores, fontes e espaços baseados na identidade visual da marca são chamadas de <strong>Design Tokens</strong>. Eles são a ponte perfeita entre o Figma e o Código.</p>" },
+        /* FIM DOS NOVOS SLIDES */
+        
+        { t: "Atividade Prática", c: "<h2>Estilização: THE WALKING DATE</h2><p>Seu objetivo é criar o arquivo <code>style.css</code> e aplicar os fundamentos vistos para dar uma estética sombria e funcional ao nosso aplicativo de encontros para zumbis.</p>" },
+        { t: "HTML Base da Atividade", c: "<pre>&lt;header class='cabecalho'&gt;\n  &lt;h1&gt;The Walking Date&lt;/h1&gt;\n&lt;/header&gt;\n\n&lt;main class='container-perfis'&gt;\n  &lt;div class='cartao-zumbi'&gt;\n    &lt;h2 class='nome'&gt;Zezinho da Foice&lt;/h2&gt;\n    &lt;p class='descricao'&gt;Gosta de longas caminhadas arrastadas...&lt;/p&gt;\n    &lt;button class='botao-match'&gt;Dar Match Sangrento&lt;/button&gt;\n  &lt;/div&gt;\n&lt;/main&gt;</pre>" },
+        { t: "Desafios Práticos I", c: "<ul><li><strong>1. Atmosfera Apocalíptica:</strong> Selecione a tag <code>body</code>, altere o <code>background-color</code> para um tom escuro (ex: <code>#1e1e1e</code>) e a <code>color</code> para verde pálido.</li><li><strong>2. Cabeçalho Sangrento:</strong> Centralize o texto de <code>.cabecalho</code> (<code>text-align: center</code>) e adicione <code>border-bottom: 3px solid red;</code>.</li></ul>" },
+        { t: "Desafios Práticos II", c: "<ul><li><strong>3. Alinhamento de Perfis:</strong> Transforme a <code>.container-perfis</code> num contêiner flexível usando <code>display: flex</code> e <code>gap: 20px</code>.</li><li><strong>4. Design dos Cartões:</strong> Em <code>.cartao-zumbi</code>, aplique uma cor de fundo mais clara que o body, <code>padding: 20px</code> e <code>border-radius: 8px</code>.</li></ul>" },
+        { t: "Desafios Práticos III", c: "<ul><li><strong>5. Call-to-Action:</strong> Estilize o <code>.botao-match</code>: fundo vermelho escuro, texto branco, sem bordas (<code>border: none</code>), <code>padding: 10px</code> e <code>cursor: pointer</code>.</li><li><strong>6. Interatividade (Bônus):</strong> Crie uma regra <code>.botao-match:hover</code> para alterar a cor de fundo do botão para vermelho vivo ao passar o mouse.</li></ul>" },
+        { t: "Desafios Práticos IV (Arquitetura Pro)", c: "<ul><li><strong>7. Design Tokens:</strong> Refatore seu CSS usando <code>:root</code> para criar variáveis como <code>--cor-fundo</code> e <code>--espaco-base</code>. Explore o uso do <code>calc()</code> nos paddings.</li><li><strong>8. Mobile First:</strong> Garanta que os cartões em <code>.container-perfis</code> fiquem em <code>flex-direction: column</code> por padrão, e use <code>@media (min-width: 768px)</code> para <code>row</code>.</li><li><strong>9. Modo Luz (O Milagre):</strong> Adicione <code>html[data-theme='light']</code> alterando suas variáveis para um tema claro.</li></ul>" }
+    ];
+
+    let current = 0;
+    const container = document.getElementById('container');
+    const counter = document.getElementById('counter');
+    const progress = document.getElementById('progress');
+
+    function render() {
+        container.innerHTML = '';
+        slides.forEach((s, i) => {
+            const div = document.createElement('div');
+            div.className = `slide ${i === current ? 'active' : ''}`;
+            div.innerHTML = `<h1>${s.t}</h1>${s.c}`;
+            container.appendChild(div);
+        });
+        counter.innerText = `${current + 1} / ${slides.length}`;
+        progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+    }
+
+    function next() { if(current < slides.length - 1) { current++; render(); } }
+    function prev() { if(current > 0) { current--; render(); } }
+
+    document.addEventListener('keydown', (e) => {
+        if(e.key === 'ArrowRight' || e.key === ' ') next();
+        if(e.key === 'ArrowLeft') prev();
+    });
+
+    render();
+</script>
+</body>
+</html>
